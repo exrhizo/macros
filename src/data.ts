@@ -39,6 +39,7 @@ export interface Ingredient {
   category: Category;
   name: string;
   quantity: number;
+  referenceQuantity: number;
   unit: Unit;
   facts: Facts;
 }
@@ -48,3 +49,40 @@ export type Tables = {
 };
 
 export const TABLES = FOOD_DATA as Tables;
+
+
+interface Discrepancy {
+  category: string;
+  name: string;
+  expectedCalories: number;
+  actualCalories: number;
+  facts: Facts;
+}
+
+export const checkAndLogDiscrepancies = (tables: Tables) => {
+  const discrepancies: Discrepancy[] = [];
+
+  Object.entries(tables).forEach(([category, ingredients]) => {
+    Object.entries(ingredients).forEach(([name, facts]) => {
+      const { NetCarbs, Fats, Protein, Calories } = facts;
+      const expectedCalories = NetCarbs * 4 + Fats * 9 + Protein * 4;
+      const discrepancy = Math.abs(expectedCalories - Calories);
+
+      if (discrepancy > 2) {
+        discrepancies.push({
+          category,
+          name,
+          expectedCalories: parseFloat(expectedCalories.toFixed(1)),
+          actualCalories: Calories,
+          facts
+        });
+      }
+    });
+  });
+
+  if (discrepancies.length > 0) {
+    console.log("Data discrepancies found", discrepancies);
+  }
+};
+
+checkAndLogDiscrepancies(TABLES);

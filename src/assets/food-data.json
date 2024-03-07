@@ -11,11 +11,11 @@
       "Soy Sauce": {"NetCarbs": 0.9, "Fats": 0, "Protein": 1.7, "Calories": 10}
     },
     "Seafood": {
-      "Cod": {"NetCarbs": 0.6, "Fats": 15, "Protein": 70, "Calories": 0},
-      "Flounder": {"NetCarbs": 1.6, "Fats": 10.5, "Protein": 70, "Calories": 0},
-      "Herring": {"NetCarbs": 0, "Fats": 15.3, "Protein": 70, "Calories": 0},
-      "Lobster": {"NetCarbs": 0.6, "Fats": 14, "Protein": 70, "Calories": 0},
-      "Mackerel": {"NetCarbs": 0, "Fats": 15.8, "Protein": 70, "Calories": 0},
+      "Cod": {"NetCarbs": 0.6, "Fats": 15, "Protein": 70, "Calories": 417},
+      "Flounder": {"NetCarbs": 1.6, "Fats": 10.5, "Protein": 70, "Calories": 381},
+      "Herring": {"NetCarbs": 0, "Fats": 15.3, "Protein": 70, "Calories": 418},
+      "Lobster": {"NetCarbs": 0.6, "Fats": 14, "Protein": 70, "Calories": 408},
+      "Mackerel": {"NetCarbs": 0, "Fats": 15.8, "Protein": 70, "Calories": 422},
       "Salmon": {"NetCarbs": 0, "Fats": 8.8, "Protein": 16.9, "Calories": 152},
       "Shrimp": {"NetCarbs": 0.2, "Fats": 0.2, "Protein": 20.4, "Calories": 84},
       "Tuna": {"NetCarbs": 0, "Fats": 4.2, "Protein": 19.8, "Calories": 122}

@@ -5,7 +5,8 @@ interface StackProps {
   fat: number;
   protein: number;
   netCarbs: number;
-  category: Category;
+  category?: Category;
+  leftAlign?: boolean;
 }
 
 const Bar = styled.div<{ width: string; color: string }>`
@@ -15,32 +16,48 @@ const Bar = styled.div<{ width: string; color: string }>`
   height: 100%;
   color: transparent;
   background-color: ${({ color }) => color};
-  width: ${({ width }) => width};
+  width: ${({ width }) => `${width}%`};
 `;
 
-const Label = styled.div`
+const Label = styled.div<{ leftAlign: boolean }>`
   color: white;
   position: absolute;
-  left: 0;
+  left: 1rem;
   top: 0;
-  right: 0;
+  right: 1rem;
   bottom: 0;
   font-size: 1.5em;
   display: flex;
-  justify-content: center;
+  justify-content: ${({ leftAlign }) => (leftAlign ? "flex-start" : "center")};
   align-items: center;
   height: 100%;
   width: 100%;
 `;
 
-const Container = styled.div<{ category: Category }>`
+const Percentages = styled.div<{ leftAlign: boolean }>`
+  color: transparent;
+  position: absolute;
+  left: 1rem;
+  top: 0;
+  right: 1rem;
+  bottom: 0;
+  font-size: 1.5em;
+  display: flex;
+  justify-content: ${({ leftAlign }) => (leftAlign ? "flex-start" : "center")};
+  align-items: center;
+  height: 100%;
+  width: 100%;
+`;
+
+const Container = styled.div<{ category?: Category }>`
   position: relative;
   width: 100%;
   height: 100%;
   background: white;
   display: flex;
-  background-color: ${({ category }) => CategoryColor[category]};
-  &:hover ${Bar} {
+  background-color: ${({ category }) =>
+    category ? CategoryColor[category] : "transparent"};
+  &:hover ${Percentages} {
     color: white;
   }
   &:hover ${Label} {
@@ -49,9 +66,15 @@ const Container = styled.div<{ category: Category }>`
 `;
 
 const calculatePercentage = (value: number, total: number) =>
-  `${Math.round((value / total) * 1000)/10}%`;
+  ((value / total) * 100).toFixed(0);
 
-const Stack: React.FC<StackProps> = ({ fat, protein, netCarbs, category }) => {
+const Stack: React.FC<StackProps> = ({
+  fat,
+  protein,
+  netCarbs,
+  category,
+  leftAlign,
+}) => {
   const totalCalories = fat * 9 + protein * 4 + netCarbs * 4;
 
   const fatPercentage = calculatePercentage(fat * 9, totalCalories);
@@ -59,11 +82,16 @@ const Stack: React.FC<StackProps> = ({ fat, protein, netCarbs, category }) => {
   const netCarbsPercentage = calculatePercentage(netCarbs * 4, totalCalories);
 
   return (
-    <Container category={category} >
-      {fat ? <Bar width={fatPercentage} color="#00000080">{fat}g</Bar> : null}
-      {protein ? <Bar width={proteinPercentage} color="#88888880">{protein}g</Bar> : null}
-      {netCarbs ? <Bar width={netCarbsPercentage} color="#FFFFFF80">{netCarbs}g</Bar> : null}
-      <Label>{Math.round(totalCalories)} cal</Label>
+    <Container category={category}>
+      {fat ? <Bar width={fatPercentage} color="#00000080" /> : null}
+      {protein ? <Bar width={proteinPercentage} color="#88888880" /> : null}
+      {netCarbs ? <Bar width={netCarbsPercentage} color="#FFFFFF80" /> : null}
+      <Label leftAlign={Boolean(leftAlign)}>
+        {Math.round(totalCalories)} cal
+      </Label>
+      <Percentages leftAlign={Boolean(leftAlign)}>
+        {fatPercentage}:{proteinPercentage}:{netCarbsPercentage}
+      </Percentages>
     </Container>
   );
 };

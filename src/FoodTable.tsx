@@ -65,7 +65,7 @@ const FoodTable: React.FC<FoodTableProps> = ({
           <StackName
             category={category}
             onClick={() =>
-              addIngredient({ category, name, facts, quantity, unit })
+              addIngredient({ category, name, facts, quantity, unit, referenceQuantity: quantity })
             }
           >
             {name}

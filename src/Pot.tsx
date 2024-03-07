@@ -1,30 +1,45 @@
 import React from "react";
 
-import { Input, Button } from "@mui/material";
+import { Input, IconButton } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 import styled from "@emotion/styled";
 
 import { Ingredient } from "./data";
 import Stack from "./Stack";
 import pot from "./assets/pot.png";
 
+const PotBackground = styled.div`
+  font-size: 3rem;
+  background-image: url(${pot});
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: #0e1a26;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  height: 20rem;
+  padding-bottom: 1rem;
+`;
+
 const Reflow = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
-`;
-
-const PotBackground = styled.div`
-  background-image: url(${pot});
-  background-size: contain;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
+  @media (min-width: 80rem) {
+    flex-direction: row;
+    ${PotBackground} {
+      width: 30rem;
+      height: 30rem;
+    }
+  }
 `;
 
 const IngredientList = styled.div`
   display: flex;
   flex-direction: column;
+  flex: 1;
 `;
 
 const IngredientItem = styled.div`
@@ -33,8 +48,10 @@ const IngredientItem = styled.div`
 `;
 
 const IngredientEditor = styled.div`
-  width: 40rem;
+  width: 20rem;
   display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const IngredientBar = styled.div<{ width: number }>`
@@ -52,59 +69,98 @@ interface PotProps {
 }
 
 const Pot: React.FC<PotProps> = ({ ingredients, onChangeQuantity }) => {
+  const scale = (val: number, q: number, ref: number) => val * (q / ref);
+
   const maxCalories = Math.max(
-    ...ingredients.map((ingredient) => ingredient.facts.Calories)
+    ...ingredients.map((ingredient) =>
+      scale(
+        ingredient.facts.Calories,
+        ingredient.quantity,
+        ingredient.referenceQuantity
+      )
+    )
   );
   const totalCalories = ingredients.reduce(
-    (acc, curr) => acc + curr.facts.Calories * curr.quantity,
+    (acc, curr) =>
+      acc + scale(curr.facts.Calories, curr.quantity, curr.referenceQuantity),
     0
   );
-  console.log("calories", {maxCalories, totalCalories, Calories: ingredients.map(i => i.facts.Calories), ingredients})
+
+  const totalFats = ingredients.reduce(
+    (acc, curr) =>
+      acc + scale(curr.facts.Fats, curr.quantity, curr.referenceQuantity),
+    0
+  );
+  const totalProtein = ingredients.reduce(
+    (acc, curr) =>
+      acc + scale(curr.facts.Protein, curr.quantity, curr.referenceQuantity),
+    0
+  );
+  const totalNetCarbs = ingredients.reduce(
+    (acc, curr) =>
+      acc + scale(curr.facts.NetCarbs, curr.quantity, curr.referenceQuantity),
+    0
+  );
+  console.log("calories", {
+    maxCalories,
+    totalCalories,
+    Calories: ingredients.map((i) => i.facts.Calories),
+    ingredients,
+  });
 
   return (
     <Reflow>
-      <PotBackground>Total Calories: {totalCalories}</PotBackground>
+      <PotBackground>
+        {totalCalories ? (
+          <Stack
+            fat={totalFats}
+            protein={totalProtein}
+            netCarbs={totalNetCarbs}
+          />
+        ) : null}
+      </PotBackground>
       <IngredientList>
-        {ingredients.map(({name, quantity, facts, category}, index) => (
-          <IngredientItem key={index}>
-            <IngredientEditor>
-              <p>{name}</p>
-              <Button
-                onClick={() =>
-                  onChangeQuantity(name, quantity - 0.25)
-                }
-              >
-                -
-              </Button>
-              <Input
-                type="number"
-                value={quantity}
-                onChange={(e) =>
-                  onChangeQuantity(name, parseFloat(e.target.value))
-                }
-                style={{ width: "60px", margin: "0 10px" }}
-              />
-              <Button
-                onClick={() =>
-                  onChangeQuantity(name, quantity + 0.25)
-                }
-              >
-                +
-              </Button>
-            </IngredientEditor>
+        {ingredients.map(
+          (
+            { name, quantity, referenceQuantity, facts, category, unit },
+            index
+          ) => (
+            <IngredientItem key={index}>
+              <IngredientEditor>
+                <div>{name}</div>
+                <div>
+                  <IconButton
+                    onClick={() => onChangeQuantity(name, quantity - 0.25)}
+                  >
+                    <RemoveIcon />
+                  </IconButton>
+                  {quantity.toFixed(2)} {unit}
+                  <IconButton
+                    onClick={() => onChangeQuantity(name, quantity + 0.25)}
+                  >
+                    <AddIcon />
+                  </IconButton>
+                </div>
+              </IngredientEditor>
 
-            <IngredientBar
-              width={(facts.Calories / maxCalories) * 100}
-            >
-              <Stack
-                fat={facts.Fats}
-                protein={facts.Protein}
-                netCarbs={facts.NetCarbs}
-                category={category}
-              />
-            </IngredientBar>
-          </IngredientItem>
-        ))}
+              <IngredientBar
+                width={
+                  (scale(facts.Calories, quantity, referenceQuantity) /
+                    maxCalories) *
+                  100
+                }
+              >
+                <Stack
+                  fat={scale(facts.Fats, quantity, referenceQuantity)}
+                  protein={scale(facts.Protein, quantity, referenceQuantity)}
+                  netCarbs={scale(facts.NetCarbs, quantity, referenceQuantity)}
+                  category={category}
+                  leftAlign
+                />
+              </IngredientBar>
+            </IngredientItem>
+          )
+        )}
       </IngredientList>
     </Reflow>
   );
